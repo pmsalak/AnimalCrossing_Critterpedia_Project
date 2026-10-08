@@ -297,3 +297,14 @@ sea_creatures.info()
     memory usage: 47.3 KB
 
 There are only 40 sea creatures to be caught in ACNH.
+
+## Combining the Data
+
+I want to combine the data for insects, fish, and sea creatures into one
+complete critterpedia dataset. I decided to use concat since each
+dataset has
+
+``` python
+#Concat Insects and Fish
+critterpedia = pd.concat([insects, fish, sea_creatures], ignore_index=True, join='outer')
+```
