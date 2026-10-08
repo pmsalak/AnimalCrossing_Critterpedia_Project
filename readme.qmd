@@ -69,6 +69,12 @@ sns.catplot(data=fish, x='Catch Difficulty', y='Sell', kind='box')
 plt.show()
 ```
 
+```{python}
+#Boxplot showing Sell price broken down by Movement Speed for Sea Creatures
+sns.catplot(data=sea_creatures, x='Movement Speed', y='Sell', kind='box')
+plt.show()
+```
+
 ## Combining the Data
 I want to combine the data for insects, fish, and sea creatures into one complete critterpedia dataset. Before doing so, I want to add a new variable to each that will describe the critter type - insect, fish, or sea creature. 
 
