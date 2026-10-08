@@ -333,6 +333,14 @@ plt.show()
 
 ![](readme_files/figure-commonmark/cell-11-output-1.png)
 
+``` python
+#Boxplot showing Sell price broken down by Shadow Size for Fish
+sns.catplot(data=fish, x='Sell', y='Shadow', kind='box')
+plt.show()
+```
+
+![](readme_files/figure-commonmark/cell-12-output-1.png)
+
 ## Combining the Data
 
 I want to combine the data for insects, fish, and sea creatures into one
@@ -378,7 +386,7 @@ sns.countplot(data=critterpedia, x='type')
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-15-output-1.png)
+![](readme_files/figure-commonmark/cell-16-output-1.png)
 
 ## Handling Missing Data
 
