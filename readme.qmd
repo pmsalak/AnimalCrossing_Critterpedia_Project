@@ -2,3 +2,49 @@
 title: "Animal Crossing - Critterpedia Project"
 format: gfm
 ---
+
+## Background
+Animal Crossing New Horizons (ACNH) is a popular video game, and one of my personal favorites. One task that players complete during the game is catching "critters" in order to complete their muesuem's collection and sell them for money. In the game, each user has a "Critterpedia" that keeps track of everything they have caught and donated to the muesuem. It is broken down into three categories: Insects, Fish, and Sea Creatures. 
+
+## The Data
+For this project, I have three excel files containing the complete information of all of the insects, fish, and sea creatures that can be caught in ACNH. The orginal source of the data I will use is Nookipedia.com, a community initiative to create a structured collection of Animal Crossing: New Horizons data. More information can be found at: https://nookipedia.com/wiki/Community:ACNH_Spreadsheet. I will begin by loading each dataset. 
+
+The first dataset contains information about insects:
+
+```{python}
+import pandas as pd
+insects = pd.read_excel("Insects.xlsx")
+insects.head()
+```
+
+```{python}
+insects.info()
+```
+
+There are 80 different insects that can be caught in ACNH. 
+
+The next dataset contains information about fish:
+
+```{python}
+fish = pd.read_excel("Fish.xlsx")
+fish.head()
+```
+
+```{python}
+fish.info()
+```
+
+There are also 80 different fish that can be caught. 
+
+The last dataset contains information about sea creatures:
+
+```{python}
+sea_creatures = pd.read_excel("Sea_Creatures.xlsx")
+sea_creatures .head()
+```
+
+```{python}
+sea_creatures.info()
+```
+
+There are only 40 sea creatures to be caught in ACNH. 
