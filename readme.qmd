@@ -1,0 +1,4 @@
+---
+title: "Animal Crossing - Critterpedia Project"
+format: gfm
+---
