@@ -298,13 +298,193 @@ sea_creatures.info()
 
 There are only 40 sea creatures to be caught in ACNH.
 
+## Data Visualization
+
+Before working on combining this data to make a complete critterpedia
+dataframe, I want to explore and visualize each type of critter on its
+own.
+
+``` python
+import seaborn as sns
+import matplotlib.pyplot as plt
+```
+
+``` python
+#Scatterplot showing Sell price vs Catches to Unlock for Insects
+sns.scatterplot(data=insects, x='Sell', y='Total Catches to Unlock')
+plt.show
+```
+
+![](readme_files/figure-commonmark/cell-9-output-1.png)
+
+``` python
+#Boxplot showing Sell price broken down by Catch Difficulty for Fish
+sns.catplot(data=fish, x='Catch Difficulty', y='Sell', kind='box')
+plt.show()
+```
+
+![](readme_files/figure-commonmark/cell-10-output-1.png)
+
 ## Combining the Data
 
 I want to combine the data for insects, fish, and sea creatures into one
-complete critterpedia dataset. I decided to use concat since each
-dataset has
+complete critterpedia dataset. Before doing so, I want to add a new
+variable to each that will describe the critter type - insect, fish, or
+sea creature.
+
+``` python
+insects['type'] = 'insect'
+fish['type'] = 'fish'
+sea_creatures['type'] = 'sea creature'
+```
+
+I decided to use concat since each dataset has unique observations, or
+“critters”, that will not have matches in the other data. However, each
+dataset contains almost identical columns/variables. I am specifying an
+outer join because I want every column from every dataset.
 
 ``` python
 #Concat Insects and Fish
 critterpedia = pd.concat([insects, fish, sea_creatures], ignore_index=True, join='outer')
 ```
+
+``` python
+#Checking that all columns are included in my critterpedia
+critterpedia.columns
+```
+
+    Index(['#', 'Name', 'Icon Image', 'Sell', 'Where/How', 'Weather',
+           'Total Catches to Unlock', 'Spawn Rates', 'NH Jan', 'NH Feb', 'NH Mar',
+           'NH Apr', 'NH May', 'NH Jun', 'NH Jul', 'NH Aug', 'NH Sep', 'NH Oct',
+           'NH Nov', 'NH Dec', 'SH Jan', 'SH Feb', 'SH Mar', 'SH Apr', 'SH May',
+           'SH Jun', 'SH Jul', 'SH Aug', 'SH Sep', 'SH Oct', 'SH Nov', 'SH Dec',
+           'Size', 'Surface', 'Description', 'Catch phrase', 'HHA Base Points',
+           'HHA Category', 'Color 1', 'Color 2', 'Icon Filename',
+           'Critterpedia Filename', 'Furniture Filename', 'Internal ID',
+           'Unique Entry ID', 'type', 'Shadow', 'Catch Difficulty', 'Vision',
+           'Lighting Type', 'Movement Speed', 'Version Added', 'Unlocked?'],
+          dtype='str')
+
+``` python
+sns.countplot(data=critterpedia, x='type')
+plt.show()
+```
+
+![](readme_files/figure-commonmark/cell-14-output-1.png)
+
+## Handling Missing Data
+
+Since columns did not match up perfectly between my datasets, I want to
+find and deal with missing values in my critterpedia.
+
+``` python
+critterpedia.isnull().sum()
+```
+
+    #                            0
+    Name                         0
+    Icon Image                   0
+    Sell                         0
+    Where/How                   40
+    Weather                    120
+    Total Catches to Unlock      0
+    Spawn Rates                  0
+    NH Jan                     129
+    NH Feb                     130
+    NH Mar                     119
+    NH Apr                     105
+    NH May                      91
+    NH Jun                      73
+    NH Jul                      57
+    NH Aug                      53
+    NH Sep                      59
+    NH Oct                     102
+    NH Nov                     111
+    NH Dec                     125
+    SH Jan                      57
+    SH Feb                      53
+    SH Mar                      59
+    SH Apr                     102
+    SH May                     111
+    SH Jun                     125
+    SH Jul                     129
+    SH Aug                     130
+    SH Sep                     119
+    SH Oct                     105
+    SH Nov                      91
+    SH Dec                      73
+    Size                         0
+    Surface                      0
+    Description                  0
+    Catch phrase                 0
+    HHA Base Points              0
+    HHA Category                 1
+    Color 1                     40
+    Color 2                     40
+    Icon Filename                0
+    Critterpedia Filename        0
+    Furniture Filename           0
+    Internal ID                  0
+    Unique Entry ID              0
+    type                         0
+    Shadow                      80
+    Catch Difficulty           120
+    Vision                     120
+    Lighting Type               80
+    Movement Speed             160
+    Version Added              160
+    Unlocked?                  160
+    dtype: int64
+
+The variable “Where/How” is missing values for the 40 sea creatures
+since this was not a column in its individual dataframe. Because of
+this, I will imput those missing values to reflect where sea creatures
+can be caught - the Sea!
+
+``` python
+critterpedia['Where/How'].fillna("Sea",inplace=True)
+critterpedia['Where/How'].value_counts()
+```
+
+    C:\Users\Parri Salak\AppData\Local\Temp\ipykernel_31804\4087519589.py:1: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+    Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+    For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+    See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+      critterpedia['Where/How'].fillna("Sea",inplace=True)
+
+    Where/How
+    Sea                                                                                  29
+    River                                                                                27
+    Pond                                                                                 12
+    On the ground                                                                        10
+    Flying near flowers                                                                   9
+    On trees (any kind)                                                                   9
+    On palm trees                                                                         8
+    On hardwood/cedar trees                                                               6
+    Flying near water                                                                     5
+    Flying                                                                                5
+    On tree stumps                                                                        4
+    On flowers                                                                            4
+    Pier                                                                                  4
+    River (clifftop)                                                                      4
+    On rivers/ponds                                                                       3
+    River (mouth)                                                                         3
+    Shaking trees (hardwood or cedar only)                                                2
+    From hitting rocks                                                                    2
+    On rotten turnips or candy                                                            1
+    Pushing snowballs                                                                     1
+    On villagers                                                                          1
+    Flying near trash (boots, tires, cans, used fountain fireworks) or rotten turnips     1
+    Disguised on shoreline                                                                1
+    Underground (dig where noise is loudest)                                              1
+    Flying near light sources                                                             1
+    On white flowers                                                                      1
+    Flying near blue/purple/black flowers                                                 1
+    On rocks/bushes                                                                       1
+    Disguised under trees                                                                 1
+    Shaking trees                                                                         1
+    On beach rocks                                                                        1
+    Sea (rainy days)                                                                      1
+    Name: count, dtype: int64

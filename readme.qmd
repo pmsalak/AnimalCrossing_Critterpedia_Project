@@ -49,10 +49,62 @@ sea_creatures.info()
 
 There are only 40 sea creatures to be caught in ACNH. 
 
+## Data Visualization
+Before working on combining this data to make a complete critterpedia dataframe, I want to explore and visualize each type of critter on its own. 
+
+```{python}
+import seaborn as sns
+import matplotlib.pyplot as plt
+```
+
+```{python}
+#Scatterplot showing Sell price vs Catches to Unlock for Insects
+sns.scatterplot(data=insects, x='Sell', y='Total Catches to Unlock')
+plt.show
+```
+
+```{python}
+#Boxplot showing Sell price broken down by Catch Difficulty for Fish
+sns.catplot(data=fish, x='Catch Difficulty', y='Sell', kind='box')
+plt.show()
+```
+
 ## Combining the Data
-I want to combine the data for insects, fish, and sea creatures into one complete critterpedia dataset. I decided to use concat since each dataset has 
+I want to combine the data for insects, fish, and sea creatures into one complete critterpedia dataset. Before doing so, I want to add a new variable to each that will describe the critter type - insect, fish, or sea creature. 
+
+```{python}
+insects['type'] = 'insect'
+fish['type'] = 'fish'
+sea_creatures['type'] = 'sea creature'
+```
+
+ I decided to use concat since each dataset has unique observations, or "critters", that will not have matches in the other data. However, each dataset contains almost identical columns/variables. I am specifying an outer join because I want every column from every dataset. 
 
 ```{python}
 #Concat Insects and Fish
 critterpedia = pd.concat([insects, fish, sea_creatures], ignore_index=True, join='outer')
+```
+
+```{python}
+#Checking that all columns are included in my critterpedia
+critterpedia.columns
+```
+
+```{python}
+sns.countplot(data=critterpedia, x='type')
+plt.show()
+```
+
+## Handling Missing Data
+Since columns did not match up perfectly between my datasets, I want to find and deal with missing values in my critterpedia.
+
+```{python}
+critterpedia.isnull().sum()
+```
+
+The variable "Where/How" is missing values for the 40 sea creatures since this was not a column in its individual dataframe. Because of this, I will imput those missing values to reflect where sea creatures can be caught - the Sea!
+
+```{python}
+critterpedia['Where/How'].fillna("Sea",inplace=True)
+critterpedia['Where/How'].value_counts()
 ```
