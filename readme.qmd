@@ -128,15 +128,7 @@ Since columns did not match up perfectly between my datasets, I want to find and
 critterpedia.isnull().sum()
 ```
 
-The variable "Where/How" is missing values for the 40 sea creatures since this was not a column in its individual dataframe. Because of this, I will imput those missing values to reflect where sea creatures can be caught - the Sea!
-
-```{python}
-critterpedia = critterpedia['Where/How'].fillna('Sea')
-critterpedia['Where/How'].value_counts()
-```
-
 Additonally, this dataset contains information about what times the critters can be caught for both the northern and southern hemisphere. This is important because the seasons in animal crossing reflect what is haapening in your real-world location. Since I am in the Northern Hemisphere, I only want to keep the data relevant to me. I will delete each of the catch time columns that start with "SH".
-
 
 ```{python}
 critterpedia = critterpedia.drop(columns=critterpedia.filter(regex=r"SH ").columns)

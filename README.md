@@ -1,5 +1,5 @@
 # Animal Crossing - Critterpedia Project
-
+Parri Salak
 
 ## Background
 
@@ -10,6 +10,11 @@ sell them for money. In the game, each user has a “Critterpedia” that
 keeps track of everything they have caught and donated to the muesuem.
 It is broken down into three categories: Insects, Fish, and Sea
 Creatures.
+
+Currently, the data for the these categories of critters is kept
+seperately. In this project I want to create one complete critterpedia
+dataframe. This will help me keep track of what I can catch in order to
+make the most money in game.
 
 ## The Data
 
@@ -302,7 +307,9 @@ There are only 40 sea creatures to be caught in ACNH.
 
 Before working on combining this data to make a complete critterpedia
 dataframe, I want to explore and visualize each type of critter on its
-own.
+own. One of the variables that I am very interested in is “Sell”. This
+is in each critter dataset, and it describes how much you can sell your
+caught critters for at the general store in game.
 
 ``` python
 import seaborn as sns
@@ -388,12 +395,29 @@ plt.show()
 
 ![](readme_files/figure-commonmark/cell-16-output-1.png)
 
-## Handling Missing Data
-
-Since columns did not match up perfectly between my datasets, I want to
-find and deal with missing values in my critterpedia.
+How does Sell price differ across types of critters?
 
 ``` python
+#Boxplot showing Sell price broken down by type of critter
+sns.catplot(data=critterpedia, x='type', y='Sell', kind='box')
+plt.show()
+```
+
+![](readme_files/figure-commonmark/cell-17-output-1.png)
+
+Just based on sell price for each type of critter, it seems like the
+best strategy for making money would be to focus on catching sea
+creatures.
+
+## Data Cleaning & Handling Missing Data
+
+Since columns did not match up perfectly between my datasets, I want to
+find and deal with missing values in my critterpedia. My goal is to make
+this as complete of a dataset as possible, so I want to minimize the
+amount of information that is missing.
+
+``` python
+#Count of missing values
 critterpedia.isnull().sum()
 ```
 
@@ -452,55 +476,25 @@ critterpedia.isnull().sum()
     Unlocked?                  160
     dtype: int64
 
-The variable “Where/How” is missing values for the 40 sea creatures
-since this was not a column in its individual dataframe. Because of
-this, I will imput those missing values to reflect where sea creatures
-can be caught - the Sea!
+Additonally, this dataset contains information about what times the
+critters can be caught for both the northern and southern hemisphere.
+This is important because the seasons in animal crossing reflect what is
+haapening in your real-world location. Since I am in the Northern
+Hemisphere, I only want to keep the data relevant to me. I will delete
+each of the catch time columns that start with “SH”.
 
 ``` python
-critterpedia['Where/How'].fillna("Sea",inplace=True)
-critterpedia['Where/How'].value_counts()
+critterpedia = critterpedia.drop(columns=critterpedia.filter(regex=r"SH ").columns)
+critterpedia.columns
 ```
 
-    C:\Users\Parri Salak\AppData\Local\Temp\ipykernel_31804\4087519589.py:1: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
-    Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
-
-    For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
-
-    See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
-      critterpedia['Where/How'].fillna("Sea",inplace=True)
-
-    Where/How
-    Sea                                                                                  29
-    River                                                                                27
-    Pond                                                                                 12
-    On the ground                                                                        10
-    Flying near flowers                                                                   9
-    On trees (any kind)                                                                   9
-    On palm trees                                                                         8
-    On hardwood/cedar trees                                                               6
-    Flying near water                                                                     5
-    Flying                                                                                5
-    On tree stumps                                                                        4
-    On flowers                                                                            4
-    Pier                                                                                  4
-    River (clifftop)                                                                      4
-    On rivers/ponds                                                                       3
-    River (mouth)                                                                         3
-    Shaking trees (hardwood or cedar only)                                                2
-    From hitting rocks                                                                    2
-    On rotten turnips or candy                                                            1
-    Pushing snowballs                                                                     1
-    On villagers                                                                          1
-    Flying near trash (boots, tires, cans, used fountain fireworks) or rotten turnips     1
-    Disguised on shoreline                                                                1
-    Underground (dig where noise is loudest)                                              1
-    Flying near light sources                                                             1
-    On white flowers                                                                      1
-    Flying near blue/purple/black flowers                                                 1
-    On rocks/bushes                                                                       1
-    Disguised under trees                                                                 1
-    Shaking trees                                                                         1
-    On beach rocks                                                                        1
-    Sea (rainy days)                                                                      1
-    Name: count, dtype: int64
+    Index(['#', 'Name', 'Icon Image', 'Sell', 'Where/How', 'Weather',
+           'Total Catches to Unlock', 'Spawn Rates', 'NH Jan', 'NH Feb', 'NH Mar',
+           'NH Apr', 'NH May', 'NH Jun', 'NH Jul', 'NH Aug', 'NH Sep', 'NH Oct',
+           'NH Nov', 'NH Dec', 'Size', 'Surface', 'Description', 'Catch phrase',
+           'HHA Base Points', 'HHA Category', 'Color 1', 'Color 2',
+           'Icon Filename', 'Critterpedia Filename', 'Furniture Filename',
+           'Internal ID', 'Unique Entry ID', 'type', 'Shadow', 'Catch Difficulty',
+           'Vision', 'Lighting Type', 'Movement Speed', 'Version Added',
+           'Unlocked?'],
+          dtype='str')
