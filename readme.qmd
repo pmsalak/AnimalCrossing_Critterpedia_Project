@@ -77,6 +77,7 @@ plt.show()
 It seems like the best time to catch insects is when it is not raining. Insecta caught during rainy weather seem to have a consistent lower sell price, whereas those caught in any weather are spread towards mor extreme values. 
 
 ```{python}
+#Finding the max sell price and which insects have that value
 max_sell = insects['Sell'].max()
 max_sell_insesect = insects[insects['Sell'] == max_sell]
 max_sell_insesect
@@ -98,6 +99,7 @@ plt.show()
 As expected, the sell price appears to increase as the fish become more difficult to catch. 
 
 ```{python}
+#Finding the max sell price and which fish have that value
 max_sell = fish['Sell'].max()
 max_sell_fish = fish[fish['Sell'] == max_sell]
 max_sell_fish
@@ -119,6 +121,7 @@ plt.show()
 Faster sea creatures, which are more difficult to catch, also seem to have a higher sell price. 
 
 ```{python}
+#Finding the max sell price and which sea creatures have that value
 max_sell = sea_creatures['Sell'].max()
 max_sell_sea_creature = sea_creatures[sea_creatures['Sell'] == max_sell]
 max_sell_sea_creature
@@ -130,6 +133,7 @@ Gigas giant clams are the sea creature with the higgest sell price at 15,000 bel
 I want to combine the data for insects, fish, and sea creatures into one complete critterpedia dataset. Before doing so, I want to add a new variable to each that will describe the critter type - insect, fish, or sea creature. 
 
 ```{python}
+#assigning the critter type for each dataset on its own before combining
 insects['type'] = 'insect'
 fish['type'] = 'fish'
 sea_creatures['type'] = 'sea creature'
@@ -181,6 +185,7 @@ critterpedia = critterpedia.drop(columns=['#','Icon Filename','Critterpedia File
 I also want to get rid of the variables related to Happy Home Academy (HHA) because it is not relevant in the catching and selling of critters. It is essentially an HOA in animal crossing that evaluates your home decor choices. Since caught critters can be displayed, the HHA has data related to them. However, I do not care what they think of me and my lifestyle choices!! Since this project is for my own personal benefit, I will be excluding their data.
 
 ```{python}
+#Filter to get rid of HHA variables and those related to it
 critterpedia = critterpedia.drop(columns=critterpedia.filter(regex=r"HHA ").columns)
 critterpedia = critterpedia.drop(columns=['Color 1','Color 2','Lighting Type','Version Added', 'Unlocked?'])
 ```
@@ -219,12 +224,22 @@ critterpedia['Where/How'] = critterpedia['Where/How'].fillna('Sea')
 critterpedia['Where/How'].isnull().sum()
 ```
 
+I also know that missing values in the month columns are a result of the citter not being aviable to catch at all during it. Rather than leave missing values, I will replace them with "Not avaiable". I think this makes sense in contrast with those that are marked as "All Day". 
+
+```{python}
+#Replace missing values for month to month catch availability with 'Not Available'
+critterpedia[['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']] = critterpedia[['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']].fillna('Not Available')
+
+critterpedia[['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']].isnull().sum()
+```
+
 ## Critter Catching Strategy
 Finally, I want to compare how the different critter types compare across variables and use the information to make a strategy for catching and selling critters in ACNH. I am interested in some summary statistics so I will group by data by critter type. I want the mean and standard deviation of Sell, Spawn Rates, and Total Catches to Unlock for each group.
 
 The “Total Catches to Unlock” refers to the total critter of that type you must catch in your lifetime before a particular species can start spawning on your island. 
 
 ```{python}
+#Grouping the data based on critter type and then getting summary statistics
 grouped_data = critterpedia.groupby('type',as_index=False).agg(
     sell_mean=('Sell','mean'),
     sell_std=('Sell','std'),
@@ -277,9 +292,19 @@ plt.show()
 Because of this, I am going to filter the data to only those critters with a high enough spawn rate and sell price. I will do that by only looking at critters that are above the average spawn rate since I can expect to encounter them on my island more frequently. Then I will sort these critters by their sell price. 
 
 ```{python}
+#Identifying target critters for catching based on sell and then spawn rates (after filtering to average or above spawn)
 target_critters = critterpedia[['Name', 'type', 'Sell', 'Spawn Rates']]
 target_critters = target_critters[target_critters['Spawn Rates'] >= critterpedia['Spawn Rates'].mean()]
 
 target_critters = target_critters.sort_values(by=['Sell', 'Spawn Rates'], ascending=False).head(10)
 target_critters
 ```
+
+Although insects appeared to have the lowest sell prices of any critter type, they are the group with the highest spawn rates. Because of this, my strategy will be to focus on catching the insects I have identified as target critters. 
+
+## Next Steps
+Although this is a good start to building my critter catching strategy from a complete critterpedia dataset, there is still work to be done. For the sake of this project, I do not have time to finish everything I wished to accomplish, but I plan to continue updating my work. 
+
+I would like to convert the month to month aviablities into the amount of hours each critter is available to be caught. All day would be come 24 and not available would be 0. However, what is more challenging is converting the rest of the unique values. For strings such as "4 PM – 9 AM" I would need to isolate the start and end times, and use them to find the time difference in hours. Then, I could further my analysis based on how much opportunity there is to catch the critters as well. 
+
+Additionally, there are a few more variables that I did not have the time to fill in the missing values for. The variable I would focus on is "Catch Difficulty". Although fish is the only critter type currently using this ranking systme, I want to analyze values from other columns for insects and sea creatures to assign them categories for catch difficulty as well. For example, using the movement speed of sea creatures to determine their catch difficulty. One idea I had for insects is  to search their "where/How" for key words such as "Flying" that would indicate a critter is moving rather than stationary. Then I could use this to assign them to difficulty levels. 

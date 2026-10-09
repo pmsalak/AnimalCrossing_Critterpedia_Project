@@ -334,7 +334,7 @@ sns.displot(data=insects, x='Sell', hue='Weather', kind='kde', multiple="stack")
 plt.show()
 ```
 
-    C:\Users\Parri Salak\AppData\Local\Temp\ipykernel_11132\1439334690.py:2: UserWarning: Dataset has 0 variance; skipping density estimate. Pass `warn_singular=False` to disable this warning.
+    C:\Users\Parri Salak\AppData\Local\Temp\ipykernel_20184\1439334690.py:2: UserWarning: Dataset has 0 variance; skipping density estimate. Pass `warn_singular=False` to disable this warning.
       sns.displot(data=insects, x='Sell', hue='Weather', kind='kde', multiple="stack")
 
 ![](readme_files/figure-commonmark/cell-10-output-2.png)
@@ -345,6 +345,7 @@ price, whereas those caught in any weather are spread towards mor
 extreme values.
 
 ``` python
+#Finding the max sell price and which insects have that value
 max_sell = insects['Sell'].max()
 max_sell_insesect = insects[insects['Sell'] == max_sell]
 max_sell_insesect
@@ -393,6 +394,7 @@ As expected, the sell price appears to increase as the fish become more
 difficult to catch.
 
 ``` python
+#Finding the max sell price and which fish have that value
 max_sell = fish['Sell'].max()
 max_sell_fish = fish[fish['Sell'] == max_sell]
 max_sell_fish
@@ -444,6 +446,7 @@ Faster sea creatures, which are more difficult to catch, also seem to
 have a higher sell price.
 
 ``` python
+#Finding the max sell price and which sea creatures have that value
 max_sell = sea_creatures['Sell'].max()
 max_sell_sea_creature = sea_creatures[sea_creatures['Sell'] == max_sell]
 max_sell_sea_creature
@@ -481,6 +484,7 @@ variable to each that will describe the critter type - insect, fish, or
 sea creature.
 
 ``` python
+#assigning the critter type for each dataset on its own before combining
 insects['type'] = 'insect'
 fish['type'] = 'fish'
 sea_creatures['type'] = 'sea creature'
@@ -564,6 +568,7 @@ and my lifestyle choices!! Since this project is for my own personal
 benefit, I will be excluding their data.
 
 ``` python
+#Filter to get rid of HHA variables and those related to it
 critterpedia = critterpedia.drop(columns=critterpedia.filter(regex=r"HHA ").columns)
 critterpedia = critterpedia.drop(columns=['Color 1','Color 2','Lighting Type','Version Added', 'Unlocked?'])
 ```
@@ -655,6 +660,32 @@ critterpedia['Where/How'].isnull().sum()
 
     np.int64(0)
 
+I also know that missing values in the month columns are a result of the
+citter not being aviable to catch at all during it. Rather than leave
+missing values, I will replace them with “Not avaiable”. I think this
+makes sense in contrast with those that are marked as “All Day”.
+
+``` python
+#Replace missing values for month to month catch availability with 'Not Available'
+critterpedia[['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']] = critterpedia[['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']].fillna('Not Available')
+
+critterpedia[['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']].isnull().sum()
+```
+
+    Jan    0
+    Feb    0
+    Mar    0
+    Apr    0
+    May    0
+    Jun    0
+    Jul    0
+    Aug    0
+    Sep    0
+    Oct    0
+    Nov    0
+    Dec    0
+    dtype: int64
+
 ## Critter Catching Strategy
 
 Finally, I want to compare how the different critter types compare
@@ -669,6 +700,7 @@ you must catch in your lifetime before a particular species can start
 spawning on your island.
 
 ``` python
+#Grouping the data based on critter type and then getting summary statistics
 grouped_data = critterpedia.groupby('type',as_index=False).agg(
     sell_mean=('Sell','mean'),
     sell_std=('Sell','std'),
@@ -713,7 +745,7 @@ sns.countplot(data=critterpedia, x='type', hue='Surface')
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-29-output-1.png)
+![](readme_files/figure-commonmark/cell-30-output-1.png)
 
 Based on this is, it seems like I am most likely to encounter insects in
 the wild, and sea creatures might take the most effort to locate.
@@ -810,7 +842,7 @@ sns.scatterplot(data=critterpedia, x='Sell', y='Spawn Rates', hue='type')
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-32-output-1.png)
+![](readme_files/figure-commonmark/cell-33-output-1.png)
 
 Because of this, I am going to filter the data to only those critters
 with a high enough spawn rate and sell price. I will do that by only
@@ -819,6 +851,7 @@ expect to encounter them on my island more frequently. Then I will sort
 these critters by their sell price.
 
 ``` python
+#Identifying target critters for catching based on sell and then spawn rates (after filtering to average or above spawn)
 target_critters = critterpedia[['Name', 'type', 'Sell', 'Spawn Rates']]
 target_critters = target_critters[target_critters['Spawn Rates'] >= critterpedia['Spawn Rates'].mean()]
 
@@ -853,3 +886,34 @@ target_critters
 | 3   | bagworm              | insect | 600  | 50          |
 
 </div>
+
+Although insects appeared to have the lowest sell prices of any critter
+type, they are the group with the highest spawn rates. Because of this,
+my strategy will be to focus on catching the insects I have identified
+as target critters.
+
+## Next Steps
+
+Although this is a good start to building my critter catching strategy
+from a complete critterpedia dataset, there is still work to be done.
+For the sake of this project, I do not have time to finish everything I
+wished to accomplish, but I plan to continue updating my work.
+
+I would like to convert the month to month aviablities into the amount
+of hours each critter is available to be caught. All day would be come
+24 and not available would be 0. However, what is more challenging is
+converting the rest of the unique values. For strings such as “4 PM – 9
+AM” I would need to isolate the start and end times, and use them to
+find the time difference in hours. Then, I could further my analysis
+based on how much opportunity there is to catch the critters as well.
+
+Additionally, there are a few more variables that I did not have the
+time to fill in the missing values for. The variable I would focus on is
+“Catch Difficulty”. Although fish is the only critter type currently
+using this ranking systme, I want to analyze values from other columns
+for insects and sea creatures to assign them categories for catch
+difficulty as well. For example, using the movement speed of sea
+creatures to determine their catch difficulty. One idea I had for
+insects is to search their “where/How” for key words such as “Flying”
+that would indicate a critter is moving rather than stationary. Then I
+could use this to assign them to difficulty levels.
