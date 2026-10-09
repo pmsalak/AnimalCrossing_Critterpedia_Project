@@ -316,37 +316,52 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 ```
 
+For the insects, I am going to make a scatteplot showing the
+relationship between sell price and the weather the are aviable to be
+caught in.
+
 ``` python
-#Scatterplot showing Sell price vs Catches to Unlock for Insects
-sns.scatterplot(data=insects, x='Sell', y='Total Catches to Unlock')
-plt.show
+#Boxplot showing Sell price broken down by Weather for Insects
+sns.catplot(data=insects, x='Weather', y='Sell', kind='box')
+plt.show()
 ```
 
 ![](readme_files/figure-commonmark/cell-9-output-1.png)
 
+It seems like the best time to catch insects is when it is not raining.
+
+Next, I’ll look at the catch difficulty of fish and their sell prices.
+
 ``` python
+#I want to specifiy the order of the categories
+custom_order = ['Very Easy', 'Easy', 'Medium', 'Hard', 'Very Hard']
+
 #Boxplot showing Sell price broken down by Catch Difficulty for Fish
-sns.catplot(data=fish, x='Catch Difficulty', y='Sell', kind='box')
+sns.catplot(data=fish, x='Catch Difficulty', y='Sell', kind='box', order=custom_order)
 plt.show()
 ```
 
 ![](readme_files/figure-commonmark/cell-10-output-1.png)
 
+As expected, the sell price appears to increase as the fish become more
+difficult to catch.
+
+Finally, I will look at the sell price for sea creatures based on their
+movement speed.
+
 ``` python
+#I want to specifiy the order of the categories
+custom_order = ['Stationary', 'Very slow', 'Slow', 'Medium', 'Fast', 'Very fast']
+
 #Boxplot showing Sell price broken down by Movement Speed for Sea Creatures
-sns.catplot(data=sea_creatures, x='Movement Speed', y='Sell', kind='box')
+sns.catplot(data=sea_creatures, x='Sell', y='Movement Speed', kind='box', order=custom_order)
 plt.show()
 ```
 
 ![](readme_files/figure-commonmark/cell-11-output-1.png)
 
-``` python
-#Boxplot showing Sell price broken down by Shadow Size for Fish
-sns.catplot(data=fish, x='Sell', y='Shadow', kind='box')
-plt.show()
-```
-
-![](readme_files/figure-commonmark/cell-12-output-1.png)
+Faster sea creatures, which are more difficult to catch, also seem to
+have a higher sell price.
 
 ## Combining the Data
 
@@ -367,7 +382,7 @@ dataset contains almost identical columns/variables. I am specifying an
 outer join because I want every column from every dataset.
 
 ``` python
-#Concat Insects and Fish
+#Concat Insects, Fish, and Sea Creatures
 critterpedia = pd.concat([insects, fish, sea_creatures], ignore_index=True, join='outer')
 ```
 
@@ -389,11 +404,12 @@ critterpedia.columns
           dtype='str')
 
 ``` python
+#Counting the number of critters of each type to make sure I am not missing any
 sns.countplot(data=critterpedia, x='type')
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-16-output-1.png)
+![](readme_files/figure-commonmark/cell-15-output-1.png)
 
 How does Sell price differ across types of critters?
 
@@ -403,13 +419,35 @@ sns.catplot(data=critterpedia, x='type', y='Sell', kind='box')
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-17-output-1.png)
+![](readme_files/figure-commonmark/cell-16-output-1.png)
 
 Just based on sell price for each type of critter, it seems like the
 best strategy for making money would be to focus on catching sea
 creatures.
 
 ## Data Cleaning & Handling Missing Data
+
+To begin, there are several columns containing ID type variables. For
+the purpose of my project, I think it is only neccessary to keep one.
+
+``` python
+#Making sure there is a unique value for all 200 critters
+critterpedia['Internal ID'].nunique()
+```
+
+    200
+
+Since “Unique Entry ID” is able to uniquely identify every critter, I am
+going to delete the other identification columns and rename it to be
+“ID”.
+
+``` python
+#Dropping extra identification columns
+critterpedia = critterpedia.drop(columns=['#','Icon Filename','Critterpedia Filename','Furniture Filename','Unique Entry ID'])
+
+#Renaming my ID column
+critterpedia = critterpedia.rename(columns={'Internal ID': 'ID'})
+```
 
 Since columns did not match up perfectly between my datasets, I want to
 find and deal with missing values in my critterpedia. My goal is to make
@@ -421,7 +459,6 @@ amount of information that is missing.
 critterpedia.isnull().sum()
 ```
 
-    #                            0
     Name                         0
     Icon Image                   0
     Sell                         0
@@ -461,11 +498,7 @@ critterpedia.isnull().sum()
     HHA Category                 1
     Color 1                     40
     Color 2                     40
-    Icon Filename                0
-    Critterpedia Filename        0
-    Furniture Filename           0
-    Internal ID                  0
-    Unique Entry ID              0
+    ID                           0
     type                         0
     Shadow                      80
     Catch Difficulty           120
@@ -488,13 +521,11 @@ critterpedia = critterpedia.drop(columns=critterpedia.filter(regex=r"SH ").colum
 critterpedia.columns
 ```
 
-    Index(['#', 'Name', 'Icon Image', 'Sell', 'Where/How', 'Weather',
+    Index(['Name', 'Icon Image', 'Sell', 'Where/How', 'Weather',
            'Total Catches to Unlock', 'Spawn Rates', 'NH Jan', 'NH Feb', 'NH Mar',
            'NH Apr', 'NH May', 'NH Jun', 'NH Jul', 'NH Aug', 'NH Sep', 'NH Oct',
            'NH Nov', 'NH Dec', 'Size', 'Surface', 'Description', 'Catch phrase',
-           'HHA Base Points', 'HHA Category', 'Color 1', 'Color 2',
-           'Icon Filename', 'Critterpedia Filename', 'Furniture Filename',
-           'Internal ID', 'Unique Entry ID', 'type', 'Shadow', 'Catch Difficulty',
-           'Vision', 'Lighting Type', 'Movement Speed', 'Version Added',
-           'Unlocked?'],
+           'HHA Base Points', 'HHA Category', 'Color 1', 'Color 2', 'ID', 'type',
+           'Shadow', 'Catch Difficulty', 'Vision', 'Lighting Type',
+           'Movement Speed', 'Version Added', 'Unlocked?'],
           dtype='str')
