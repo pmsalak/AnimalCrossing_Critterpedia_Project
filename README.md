@@ -437,7 +437,8 @@ critterpedia['Name'].nunique()
 
     200
 
-Since “Name” is able to uniquely identify every critter.
+Since “Name” is able to uniquely identify every critter I will use it as
+my ID variable.
 
 ``` python
 #Dropping extra identification columns
@@ -456,58 +457,6 @@ benefit, I will be excluding their data.
 critterpedia = critterpedia.drop(columns=critterpedia.filter(regex=r"HHA ").columns)
 critterpedia = critterpedia.drop(columns=['Color 1','Color 2','Lighting Type','Version Added', 'Unlocked?'])
 ```
-
-Since columns did not match up perfectly between my datasets, I want to
-find and deal with missing values in my critterpedia. My goal is to make
-this as complete of a dataset as possible, so I want to minimize the
-amount of information that is missing.
-
-``` python
-#Count of missing values
-critterpedia.isnull().sum()
-```
-
-    Name                         0
-    Icon Image                   0
-    Sell                         0
-    Where/How                   40
-    Weather                    120
-    Total Catches to Unlock      0
-    Spawn Rates                  0
-    NH Jan                     129
-    NH Feb                     130
-    NH Mar                     119
-    NH Apr                     105
-    NH May                      91
-    NH Jun                      73
-    NH Jul                      57
-    NH Aug                      53
-    NH Sep                      59
-    NH Oct                     102
-    NH Nov                     111
-    NH Dec                     125
-    SH Jan                      57
-    SH Feb                      53
-    SH Mar                      59
-    SH Apr                     102
-    SH May                     111
-    SH Jun                     125
-    SH Jul                     129
-    SH Aug                     130
-    SH Sep                     119
-    SH Oct                     105
-    SH Nov                      91
-    SH Dec                      73
-    Size                         0
-    Surface                      0
-    Description                  0
-    Catch phrase                 0
-    type                         0
-    Shadow                      80
-    Catch Difficulty           120
-    Vision                     120
-    Movement Speed             160
-    dtype: int64
 
 Additonally, this dataset contains information about what times the
 critters can be caught for both the northern and southern hemisphere.
@@ -544,18 +493,67 @@ take the average value.
 critterpedia['Spawn Rates'] = critterpedia['Spawn Rates'].str.split("–").str[0].astype('int')
 ```
 
+Since columns did not match up perfectly between my datasets, I want to
+find and deal with missing values in my critterpedia. My goal is to make
+this as complete of a dataset as possible, so I want to minimize the
+amount of information that is missing.
+
+``` python
+#Count of missing values
+critterpedia.isnull().sum()
+```
+
+    Name                         0
+    Icon Image                   0
+    Sell                         0
+    Where/How                   40
+    Weather                    120
+    Total Catches to Unlock      0
+    Spawn Rates                  0
+    Jan                        129
+    Feb                        130
+    Mar                        119
+    Apr                        105
+    May                         91
+    Jun                         73
+    Jul                         57
+    Aug                         53
+    Sep                         59
+    Oct                        102
+    Nov                        111
+    Dec                        125
+    Size                         0
+    Surface                      0
+    Description                  0
+    Catch phrase                 0
+    type                         0
+    Shadow                      80
+    Catch Difficulty           120
+    Vision                     120
+    Movement Speed             160
+    dtype: int64
+
 ## Critter Catching Strategy
 
 Finally, I want to compare how the different critter types compare
 across variables and use the information to make a strategy for catching
-and selling critters in ACNH.
+and selling critters in ACNH. I am interested in some summary statistics
+so I will group by data by critter type. I want the mean and standard
+deviation of Sell, Spawn Rates, and Total Catches to Unlock for each
+group.
+
+The “Total Catches to Unlock” refers to the total critter of that type
+you must catch in your lifetime before a particular species can start
+spawning on your island.
 
 ``` python
 grouped_data = critterpedia.groupby('type',as_index=False).agg(
     sell_mean=('Sell','mean'),
     sell_std=('Sell','std'),
     spawn_mean=('Spawn Rates','mean'),
-    spawn_std=('Spawn Rates','std')
+    spawn_std=('Spawn Rates','std'),
+    catch_to_unlock_mean=('Total Catches to Unlock','mean'),
+    catch_to_unlock_std=('Total Catches to Unlock','std')
 )
 
 grouped_data
@@ -574,10 +572,23 @@ grouped_data
     }
 </style>
 
-|     | type         | sell_mean | sell_std    | spawn_mean | spawn_std |
-|-----|--------------|-----------|-------------|------------|-----------|
-| 0   | fish         | 3745.0    | 4517.151561 | 3.8625     | 3.893337  |
-| 1   | insect       | 2220.5    | 3209.388877 | 26.3375    | 29.915469 |
-| 2   | sea creature | 3345.0    | 3730.742004 | 2.6750     | 1.685344  |
+|  | type | sell_mean | sell_std | spawn_mean | spawn_std | catch_to_unlock_mean | catch_to_unlock_std |
+|----|----|----|----|----|----|----|----|
+| 0 | fish | 3745.0 | 4517.151561 | 3.8625 | 3.893337 | 19.250 | 27.364164 |
+| 1 | insect | 2220.5 | 3209.388877 | 26.3375 | 29.915469 | 17.500 | 30.084270 |
+| 2 | sea creature | 3345.0 | 3730.742004 | 2.6750 | 1.685344 | 21.625 | 28.338329 |
 
 </div>
+
+Another variable I am intereste in is surface. It is a yes or no value
+describing how easy it is to find the critter. Those that are ‘yes’
+appear in the wild, while the ’no’s are not part of normal surface
+wildlife and may require more effort to locate.
+
+``` python
+#Countplot showing how many surface y/n are each critter type
+sns.countplot(data=critterpedia, x='type', hue='Surface')
+plt.show()
+```
+
+![](readme_files/figure-commonmark/cell-24-output-1.png)

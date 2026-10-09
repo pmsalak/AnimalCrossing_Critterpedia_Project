@@ -141,7 +141,7 @@ To begin, there are several columns containing ID type variables. For the purpos
 critterpedia['Name'].nunique()
 ```
 
-Since "Name" is able to uniquely identify every critter.
+Since "Name" is able to uniquely identify every critter I will use it as my ID variable. 
 
 ```{python}
 #Dropping extra identification columns
@@ -153,13 +153,6 @@ I also want to get rid of the variables related to Happy Home Academy (HHA) beca
 ```{python}
 critterpedia = critterpedia.drop(columns=critterpedia.filter(regex=r"HHA ").columns)
 critterpedia = critterpedia.drop(columns=['Color 1','Color 2','Lighting Type','Version Added', 'Unlocked?'])
-```
-
-Since columns did not match up perfectly between my datasets, I want to find and deal with missing values in my critterpedia. My goal is to make this as complete of a dataset as possible, so I want to minimize the amount of information that is missing. 
-
-```{python}
-#Count of missing values
-critterpedia.isnull().sum()
 ```
 
 Additonally, this dataset contains information about what times the critters can be caught for both the northern and southern hemisphere. This is important because the seasons in animal crossing reflect what is haapening in your real-world location. Since I am in the Northern Hemisphere, I only want to keep the data relevant to me. I will delete each of the catch time columns that start with "SH".
@@ -181,17 +174,35 @@ The variable "Spawn Rates" respresents the percent chance of that critter being 
 critterpedia['Spawn Rates'] = critterpedia['Spawn Rates'].str.split("–").str[0].astype('int')
 ```
 
-## Critter Catching Strategy
-Finally, I want to compare how the different critter types compare across variables and use the information to make a strategy for catching and selling critters in ACNH. 
+Since columns did not match up perfectly between my datasets, I want to find and deal with missing values in my critterpedia. My goal is to make this as complete of a dataset as possible, so I want to minimize the amount of information that is missing. 
 
+```{python}
+#Count of missing values
+critterpedia.isnull().sum()
+```
+
+## Critter Catching Strategy
+Finally, I want to compare how the different critter types compare across variables and use the information to make a strategy for catching and selling critters in ACNH. I am interested in some summary statistics so I will group by data by critter type. I want the mean and standard deviation of Sell, Spawn Rates, and Total Catches to Unlock for each group.
+
+The “Total Catches to Unlock” refers to the total critter of that type you must catch in your lifetime before a particular species can start spawning on your island. 
 
 ```{python}
 grouped_data = critterpedia.groupby('type',as_index=False).agg(
     sell_mean=('Sell','mean'),
     sell_std=('Sell','std'),
     spawn_mean=('Spawn Rates','mean'),
-    spawn_std=('Spawn Rates','std')
+    spawn_std=('Spawn Rates','std'),
+    catch_to_unlock_mean=('Total Catches to Unlock','mean'),
+    catch_to_unlock_std=('Total Catches to Unlock','std')
 )
 
 grouped_data
+```
+
+Another variable I am intereste in is surface. It is a yes or no value describing how easy it is to find the critter. Those that are 'yes' appear in the wild, while the 'no's are not part of normal surface wildlife and may require more effort to locate. 
+
+```{python}
+#Countplot showing how many surface y/n are each critter type
+sns.countplot(data=critterpedia, x='type', hue='Surface')
+plt.show()
 ```
