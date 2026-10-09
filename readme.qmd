@@ -68,7 +68,13 @@ sns.catplot(data=insects, x='Weather', y='Sell', kind='box')
 plt.show()
 ```
 
-It seems like the best time to catch insects is when it is not raining. 
+```{python}
+#Stacked histogram for the distribution of Sell by weather
+sns.displot(data=insects, x='Sell', hue='Weather', kind='kde', multiple="stack")
+plt.show()
+```
+
+It seems like the best time to catch insects is when it is not raining. Insecta caught during rainy weather seem to have a consistent lower sell price, whereas those caught in any weather are spread towards mor extreme values. 
 
 ```{python}
 max_sell = insects['Sell'].max()
@@ -151,7 +157,7 @@ How does Sell price differ across types of critters?
 
 ```{python}
 #Boxplot showing Sell price broken down by type of critter
-sns.catplot(data=critterpedia, x='type', y='Sell', kind='box')
+sns.catplot(data=critterpedia, x='type', y='Sell', kind='box', hue='type')
 plt.show()
 ```
 
@@ -205,6 +211,14 @@ Since columns did not match up perfectly between my datasets, I want to find and
 critterpedia.isnull().sum()
 ```
 
+Based on the counts of missing values, I know that only sea creaturtes are missing data for the "Where/How" varibale. Because of this, I can fill in all missing values for it with the "Sea".
+
+```{python}
+#Replace missing values for where/how with 'sea'
+critterpedia['Where/How'] = critterpedia['Where/How'].fillna('Sea')
+critterpedia['Where/How'].isnull().sum()
+```
+
 ## Critter Catching Strategy
 Finally, I want to compare how the different critter types compare across variables and use the information to make a strategy for catching and selling critters in ACNH. I am interested in some summary statistics so I will group by data by critter type. I want the mean and standard deviation of Sell, Spawn Rates, and Total Catches to Unlock for each group.
 
@@ -250,6 +264,15 @@ target_critters
 ```
 
 Although this gives me the critters that can be sold for the most bells, they all have extremely low spawn rates that would make it difficult to specifically aim to catch them. 
+
+I suspect that as sell price increases, spawn rates descrease. This would be why I am having a more difficult time identifying critters with high values for each. I'll use a scatterplot to investigate this.
+
+```{python}
+#Scatterplot showing the relationship between sell price and spawn rates
+#Colored by critter type
+sns.scatterplot(data=critterpedia, x='Sell', y='Spawn Rates', hue='type')
+plt.show()
+```
 
 Because of this, I am going to filter the data to only those critters with a high enough spawn rate and sell price. I will do that by only looking at critters that are above the average spawn rate since I can expect to encounter them on my island more frequently. Then I will sort these critters by their sell price. 
 

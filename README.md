@@ -328,7 +328,21 @@ plt.show()
 
 ![](readme_files/figure-commonmark/cell-9-output-1.png)
 
+``` python
+#Stacked histogram for the distribution of Sell by weather
+sns.displot(data=insects, x='Sell', hue='Weather', kind='kde', multiple="stack")
+plt.show()
+```
+
+    C:\Users\Parri Salak\AppData\Local\Temp\ipykernel_11132\1439334690.py:2: UserWarning: Dataset has 0 variance; skipping density estimate. Pass `warn_singular=False` to disable this warning.
+      sns.displot(data=insects, x='Sell', hue='Weather', kind='kde', multiple="stack")
+
+![](readme_files/figure-commonmark/cell-10-output-2.png)
+
 It seems like the best time to catch insects is when it is not raining.
+Insecta caught during rainy weather seem to have a consistent lower sell
+price, whereas those caught in any weather are spread towards mor
+extreme values.
 
 ``` python
 max_sell = insects['Sell'].max()
@@ -373,7 +387,7 @@ sns.catplot(data=fish, x='Catch Difficulty', y='Sell', kind='box', order=custom_
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-11-output-1.png)
+![](readme_files/figure-commonmark/cell-12-output-1.png)
 
 As expected, the sell price appears to increase as the fish become more
 difficult to catch.
@@ -424,7 +438,7 @@ sns.catplot(data=sea_creatures, x='Sell', y='Movement Speed', kind='box', order=
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-13-output-1.png)
+![](readme_files/figure-commonmark/cell-14-output-1.png)
 
 Faster sea creatures, which are more difficult to catch, also seem to
 have a higher sell price.
@@ -505,17 +519,17 @@ sns.countplot(data=critterpedia, x='type')
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-18-output-1.png)
+![](readme_files/figure-commonmark/cell-19-output-1.png)
 
 How does Sell price differ across types of critters?
 
 ``` python
 #Boxplot showing Sell price broken down by type of critter
-sns.catplot(data=critterpedia, x='type', y='Sell', kind='box')
+sns.catplot(data=critterpedia, x='type', y='Sell', kind='box', hue='type')
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-19-output-1.png)
+![](readme_files/figure-commonmark/cell-20-output-1.png)
 
 Just based on sell price for each type of critter, it seems like the
 best strategy for making money would be to focus on catching sea
@@ -629,6 +643,18 @@ critterpedia.isnull().sum()
     Movement Speed             160
     dtype: int64
 
+Based on the counts of missing values, I know that only sea creaturtes
+are missing data for the “Where/How” varibale. Because of this, I can
+fill in all missing values for it with the “Sea”.
+
+``` python
+#Replace missing values for where/how with 'sea'
+critterpedia['Where/How'] = critterpedia['Where/How'].fillna('Sea')
+critterpedia['Where/How'].isnull().sum()
+```
+
+    np.int64(0)
+
 ## Critter Catching Strategy
 
 Finally, I want to compare how the different critter types compare
@@ -687,7 +713,7 @@ sns.countplot(data=critterpedia, x='type', hue='Surface')
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-27-output-1.png)
+![](readme_files/figure-commonmark/cell-29-output-1.png)
 
 Based on this is, it seems like I am most likely to encounter insects in
 the wild, and sea creatures might take the most effort to locate.
@@ -772,6 +798,19 @@ target_critters
 Although this gives me the critters that can be sold for the most bells,
 they all have extremely low spawn rates that would make it difficult to
 specifically aim to catch them.
+
+I suspect that as sell price increases, spawn rates descrease. This
+would be why I am having a more difficult time identifying critters with
+high values for each. I’ll use a scatterplot to investigate this.
+
+``` python
+#Scatterplot showing the relationship between sell price and spawn rates
+#Colored by critter type
+sns.scatterplot(data=critterpedia, x='Sell', y='Spawn Rates', hue='type')
+plt.show()
+```
+
+![](readme_files/figure-commonmark/cell-32-output-1.png)
 
 Because of this, I am going to filter the data to only those critters
 with a high enough spawn rate and sell price. I will do that by only
