@@ -5,7 +5,7 @@ format: gfm
 ---
 
 ## Background
-Animal Crossing New Horizons (ACNH) is a popular video game, and one of my personal favorites. One task that players complete during the game is catching "critters" in order to complete their muesuem's collection and sell them for money. In the game, each user has a "Critterpedia" that keeps track of everything they have caught and donated to the muesuem. It is broken down into three categories: Insects, Fish, and Sea Creatures. 
+Animal Crossing New Horizons (ACNH) is a popular video game, and one of my personal favorites. One task that players complete during the game is catching "critters" in order to complete their muesuem's collection and sell them for bells (the in-game currency). In the game, each user has a "Critterpedia" that keeps track of everything they have caught and donated to the muesuem. It is broken down into three categories: Insects, Fish, and Sea Creatures. 
 
 Currently, the data for the these categories of critters is kept seperately. In this project I want to create one complete critterpedia dataframe. This will help see what I can catch and develop a strategy in order to make the most money in game. 
 
@@ -70,6 +70,14 @@ plt.show()
 
 It seems like the best time to catch insects is when it is not raining. 
 
+```{python}
+max_sell = insects['Sell'].max()
+max_sell_insesect = insects[insects['Sell'] == max_sell]
+max_sell_insesect
+```
+
+The higgest sell price for insects is 12,000 bells. The three insects with this sell price are the giraffe stag, golden stag, and horned hercules. 
+
 Next, I'll look at the catch difficulty of fish and their sell prices. 
 
 ```{python}
@@ -83,6 +91,14 @@ plt.show()
 
 As expected, the sell price appears to increase as the fish become more difficult to catch. 
 
+```{python}
+max_sell = fish['Sell'].max()
+max_sell_fish = fish[fish['Sell'] == max_sell]
+max_sell_fish
+```
+
+The highest sell price for fish is 15,000 bells. There are six different fish that can be caught and sold at this price.  
+
 Finally, I will look at the sell price for sea creatures based on their movement speed. 
 
 ```{python}
@@ -95,6 +111,14 @@ plt.show()
 ```
 
 Faster sea creatures, which are more difficult to catch, also seem to have a higher sell price. 
+
+```{python}
+max_sell = sea_creatures['Sell'].max()
+max_sell_sea_creature = sea_creatures[sea_creatures['Sell'] == max_sell]
+max_sell_sea_creature
+```
+
+Gigas giant clams are the sea creature with the higgest sell price at 15,000 bells. This is the same price as the higgest sell price for fish, but there were many more fish species at that price. 
 
 ## Combining the Data
 I want to combine the data for insects, fish, and sea creatures into one complete critterpedia dataset. Before doing so, I want to add a new variable to each that will describe the critter type - insect, fish, or sea creature. 
@@ -167,7 +191,7 @@ critterpedia.columns = critterpedia.columns.str.replace(r"NH ", "", regex=True)
 critterpedia.columns
 ```
 
-The variable "Spawn Rates" respresents the percent chance of that critter being present on your island/avaiable to catch in your game at any given time. However, it is a string datatype right now because some of the values are listed as a range like "5-10". I want to fix this and take the average value. 
+The variable "Spawn Rates" respresents the percent chance of that critter being present on your island/avaiable to catch in your game at any given time. However, it is a string datatype right now because some of the values are listed as a range like "5-10". I want to fix this and take the lower number to be more conservative. 
 
 ```{python}
 #Split the string, take the first value, then make it an integer
@@ -205,4 +229,34 @@ Another variable I am intereste in is surface. It is a yes or no value describin
 #Countplot showing how many surface y/n are each critter type
 sns.countplot(data=critterpedia, x='type', hue='Surface')
 plt.show()
+```
+
+Based on this is, it seems like I am most likely to encounter insects in the wild, and sea creatures might take the most effort to locate. 
+
+Now I want to look at which critters that spawn most frequently will sell for the higgest price. 
+
+```{python}
+#Showing critters with the higgest spawn rates that sell for the most bells
+target_critters = critterpedia[['Name', 'type', 'Spawn Rates', 'Sell']].sort_values(by=['Spawn Rates', 'Sell'], ascending=False).head(10)
+target_critters
+```
+
+The results in a top ten target critters that are insects. However, none of the sell prices are over 500. This is quite small considering that the higgest sell price for insects is 12,000. I want to see what the target critters would be if I decided to prioritze sell before spawn rates.
+
+```{python}
+#Showing critters with the higgest sell price the spawn the most
+target_critters = critterpedia[['Name', 'type', 'Sell', 'Spawn Rates']].sort_values(by=['Sell', 'Spawn Rates'], ascending=False).head(10)
+target_critters
+```
+
+Although this gives me the critters that can be sold for the most bells, they all have extremely low spawn rates that would make it difficult to specifically aim to catch them. 
+
+Because of this, I am going to filter the data to only those critters with a high enough spawn rate and sell price. I will do that by only looking at critters that are above the average spawn rate since I can expect to encounter them on my island more frequently. Then I will sort these critters by their sell price. 
+
+```{python}
+target_critters = critterpedia[['Name', 'type', 'Sell', 'Spawn Rates']]
+target_critters = target_critters[target_critters['Spawn Rates'] >= critterpedia['Spawn Rates'].mean()]
+
+target_critters = target_critters.sort_values(by=['Sell', 'Spawn Rates'], ascending=False).head(10)
+target_critters
 ```

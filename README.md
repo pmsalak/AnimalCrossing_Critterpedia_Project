@@ -6,10 +6,10 @@ Parri Salak
 Animal Crossing New Horizons (ACNH) is a popular video game, and one of
 my personal favorites. One task that players complete during the game is
 catching “critters” in order to complete their muesuem’s collection and
-sell them for money. In the game, each user has a “Critterpedia” that
-keeps track of everything they have caught and donated to the muesuem.
-It is broken down into three categories: Insects, Fish, and Sea
-Creatures.
+sell them for bells (the in-game currency). In the game, each user has a
+“Critterpedia” that keeps track of everything they have caught and
+donated to the muesuem. It is broken down into three categories:
+Insects, Fish, and Sea Creatures.
 
 Currently, the data for the these categories of critters is kept
 seperately. In this project I want to create one complete critterpedia
@@ -330,6 +330,38 @@ plt.show()
 
 It seems like the best time to catch insects is when it is not raining.
 
+``` python
+max_sell = insects['Sell'].max()
+max_sell_insesect = insects[insects['Sell'] == max_sell]
+max_sell_insesect
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|  | \# | Name | Icon Image | Sell | Where/How | Weather | Total Catches to Unlock | Spawn Rates | NH Jan | NH Feb | ... | Catch phrase | HHA Base Points | HHA Category | Color 1 | Color 2 | Icon Filename | Critterpedia Filename | Furniture Filename | Internal ID | Unique Entry ID |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 29 | 61 | giraffe stag | https://nh-cdn.catalogue.ac/MenuIcon/Ins77.png | 12000 | On palm trees | Any weather | 100 | 1 | NaN | NaN | ... | I caught a giraffe stag! Does that make it a l... | 64 | Pet | Black | Black | Ins77 | InsectGirafanokogirikuwagata | FtrInsectGirafanokogirikuwagata | 3482 | PSChjzMhGwhnsHTs4 |
+| 30 | 60 | golden stag | https://nh-cdn.catalogue.ac/MenuIcon/Ins50.png | 12000 | On palm trees | Any weather | 100 | 1 | NaN | NaN | ... | Wooooow! I caught a golden stag! Does this mea... | 64 | Pet | Black | Yellow | Ins50 | InsectOugononikuwagata | FtrInsectOugononikuwagata | 638 | 2C8cSphidFCBPxYEe |
+| 39 | 65 | horned hercules | https://nh-cdn.catalogue.ac/MenuIcon/Ins54.png | 12000 | On palm trees | Any weather | 100 | 1 | NaN | NaN | ... | I caught a horned hercules! Guess I was stronger! | 64 | Pet | Yellow | Black | Ins54 | InsectHerakuresuohkabuto | FtrInsectHerakuresuohkabuto | 600 | TqhEomNEMDZ2wcTpk |
+
+<p>3 rows × 45 columns</p>
+</div>
+
+The higgest sell price for insects is 12,000 bells. The three insects
+with this sell price are the giraffe stag, golden stag, and horned
+hercules.
+
 Next, I’ll look at the catch difficulty of fish and their sell prices.
 
 ``` python
@@ -341,10 +373,44 @@ sns.catplot(data=fish, x='Catch Difficulty', y='Sell', kind='box', order=custom_
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-10-output-1.png)
+![](readme_files/figure-commonmark/cell-11-output-1.png)
 
 As expected, the sell price appears to increase as the fish become more
 difficult to catch.
+
+``` python
+max_sell = fish['Sell'].max()
+max_sell_fish = fish[fish['Sell'] == max_sell]
+max_sell_fish
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|  | \# | Name | Icon Image | Sell | Where/How | Shadow | Catch Difficulty | Vision | Total Catches to Unlock | Spawn Rates | ... | HHA Base Points | HHA Category | Color 1 | Color 2 | Lighting Type | Icon Filename | Critterpedia Filename | Furniture Filename | Internal ID | Unique Entry ID |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 5 | 79 | barreleye | https://nh-cdn.catalogue.ac/MenuIcon/Fish84.png | 15000 | Sea | Small | Very Hard | Very Narrow | 100 | 1 | ... | 71 | Pet | Black | Black | Fluorescent | Fish84 | FishDemenigisu | FtrFishDemenigisu | 4204 | BpqTa4zmTjv3Nm4wE |
+| 18 | 80 | coelacanth | https://nh-cdn.catalogue.ac/MenuIcon/Fish63.png | 15000 | Sea (rainy days) | XX-Large | Very Hard | Very Narrow | 100 | 1–2 | ... | 71 | Pet | Black | Black | Fluorescent | Fish63 | FishSirakansu | FtrFishSirakansu | 2284 | NjMZQ6Xi9NswEXnHH |
+| 23 | 42 | dorado | https://nh-cdn.catalogue.ac/MenuIcon/Fish34.png | 15000 | River | X-Large | Very Hard | Narrow | 100 | 1–2 | ... | 71 | Pet | Yellow | Black | Fluorescent | Fish34 | FishDolado | FtrFishDolado | 2251 | G7ZwD67cRMHBwTSKH |
+| 30 | 29 | golden trout | https://nh-cdn.catalogue.ac/MenuIcon/Fish79.png | 15000 | River (clifftop) | Medium | Very Hard | Very Narrow | 100 | 1 | ... | 71 | Pet | Brown | Black | Fluorescent | Fish79 | FishGoldenTorauto | FtrFishGoldenTorauto | 4193 | wwGzR7FzWNJ7cDz9X |
+| 32 | 74 | great white shark | https://nh-cdn.catalogue.ac/MenuIcon/Fish62.png | 15000 | Sea | X-Large w/Fin | Very Hard | Narrow | 50 | 2 | ... | 71 | Pet | Blue | Blue | No lighting | Fish62 | FishSame | FtrFishSame | 2280 | EPypAeJGuTDGFJRnx |
+| 69 | 30 | stringfish | https://nh-cdn.catalogue.ac/MenuIcon/Fish26.png | 15000 | River (clifftop) | X-Large | Very Hard | Very Narrow | 100 | 1 | ... | 71 | Pet | Brown | Black | Fluorescent | Fish26 | FishItou | FtrFishItou | 2241 | APXg8kSzjcmoGGWSP |
+
+<p>6 rows × 48 columns</p>
+</div>
+
+The highest sell price for fish is 15,000 bells. There are six different
+fish that can be caught and sold at this price.
 
 Finally, I will look at the sell price for sea creatures based on their
 movement speed.
@@ -358,10 +424,40 @@ sns.catplot(data=sea_creatures, x='Sell', y='Movement Speed', kind='box', order=
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-11-output-1.png)
+![](readme_files/figure-commonmark/cell-13-output-1.png)
 
 Faster sea creatures, which are more difficult to catch, also seem to
 have a higher sell price.
+
+``` python
+max_sell = sea_creatures['Sell'].max()
+max_sell_sea_creature = sea_creatures[sea_creatures['Sell'] == max_sell]
+max_sell_sea_creature
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|  | \# | Name | Icon Image | Sell | Shadow | Movement Speed | Total Catches to Unlock | Spawn Rates | NH Jan | NH Feb | ... | Color 1 | Color 2 | Lighting Type | Icon Filename | Critterpedia Filename | Furniture Filename | Version Added | Unlocked? | Internal ID | Unique Entry ID |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 8 | 18 | gigas giant clam | https://nh-cdn.catalogue.ac/MenuIcon/Shakogai.png | 15000 | X-Large | Very fast | 80 | 1 | NaN | NaN | ... | NaN | NaN | Fluorescent | Shakogai | DiveFishShakogai | FtrDiveFishShakogai | 1.3.0 | Yes | 7214 | EQmRaHjokMEGTDC7G |
+
+<p>1 rows × 48 columns</p>
+</div>
+
+Gigas giant clams are the sea creature with the higgest sell price at
+15,000 bells. This is the same price as the higgest sell price for fish,
+but there were many more fish species at that price.
 
 ## Combining the Data
 
@@ -409,7 +505,7 @@ sns.countplot(data=critterpedia, x='type')
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-15-output-1.png)
+![](readme_files/figure-commonmark/cell-18-output-1.png)
 
 How does Sell price differ across types of critters?
 
@@ -419,7 +515,7 @@ sns.catplot(data=critterpedia, x='type', y='Sell', kind='box')
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-16-output-1.png)
+![](readme_files/figure-commonmark/cell-19-output-1.png)
 
 Just based on sell price for each type of critter, it seems like the
 best strategy for making money would be to focus on catching sea
@@ -486,7 +582,7 @@ The variable “Spawn Rates” respresents the percent chance of that
 critter being present on your island/avaiable to catch in your game at
 any given time. However, it is a string datatype right now because some
 of the values are listed as a range like “5-10”. I want to fix this and
-take the average value.
+take the lower number to be more conservative.
 
 ``` python
 #Split the string, take the first value, then make it an integer
@@ -591,4 +687,130 @@ sns.countplot(data=critterpedia, x='type', hue='Surface')
 plt.show()
 ```
 
-![](readme_files/figure-commonmark/cell-24-output-1.png)
+![](readme_files/figure-commonmark/cell-27-output-1.png)
+
+Based on this is, it seems like I am most likely to encounter insects in
+the wild, and sea creatures might take the most effort to locate.
+
+Now I want to look at which critters that spawn most frequently will
+sell for the higgest price.
+
+``` python
+#Showing critters with the higgest spawn rates that sell for the most bells
+target_critters = critterpedia[['Name', 'type', 'Spawn Rates', 'Sell']].sort_values(by=['Spawn Rates', 'Sell'], ascending=False).head(10)
+target_critters
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | Name              | type   | Spawn Rates | Sell |
+|-----|-------------------|--------|-------------|------|
+| 23  | firefly           | insect | 200         | 300  |
+| 60  | red dragonfly     | insect | 80          | 180  |
+| 11  | common bluebottle | insect | 70          | 300  |
+| 62  | robust cicada     | insect | 70          | 300  |
+| 7   | brown cicada      | insect | 70          | 250  |
+| 49  | monarch butterfly | insect | 70          | 140  |
+| 15  | damselfly         | insect | 60          | 500  |
+| 5   | bell cricket      | insect | 60          | 430  |
+| 12  | common butterfly  | insect | 60          | 160  |
+| 32  | grasshopper       | insect | 60          | 160  |
+
+</div>
+
+The results in a top ten target critters that are insects. However, none
+of the sell prices are over 500. This is quite small considering that
+the higgest sell price for insects is 12,000. I want to see what the
+target critters would be if I decided to prioritze sell before spawn
+rates.
+
+``` python
+#Showing critters with the higgest sell price the spawn the most
+target_critters = critterpedia[['Name', 'type', 'Sell', 'Spawn Rates']].sort_values(by=['Sell', 'Spawn Rates'], ascending=False).head(10)
+target_critters
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | Name              | type         | Sell  | Spawn Rates |
+|-----|-------------------|--------------|-------|-------------|
+| 112 | great white shark | fish         | 15000 | 2           |
+| 85  | barreleye         | fish         | 15000 | 1           |
+| 98  | coelacanth        | fish         | 15000 | 1           |
+| 103 | dorado            | fish         | 15000 | 1           |
+| 110 | golden trout      | fish         | 15000 | 1           |
+| 149 | stringfish        | fish         | 15000 | 1           |
+| 168 | gigas giant clam  | sea creature | 15000 | 1           |
+| 157 | whale shark       | fish         | 13000 | 1           |
+| 29  | giraffe stag      | insect       | 12000 | 1           |
+| 30  | golden stag       | insect       | 12000 | 1           |
+
+</div>
+
+Although this gives me the critters that can be sold for the most bells,
+they all have extremely low spawn rates that would make it difficult to
+specifically aim to catch them.
+
+Because of this, I am going to filter the data to only those critters
+with a high enough spawn rate and sell price. I will do that by only
+looking at critters that are above the average spawn rate since I can
+expect to encounter them on my island more frequently. Then I will sort
+these critters by their sell price.
+
+``` python
+target_critters = critterpedia[['Name', 'type', 'Sell', 'Spawn Rates']]
+target_critters = target_critters[target_critters['Spawn Rates'] >= critterpedia['Spawn Rates'].mean()]
+
+target_critters = target_critters.sort_values(by=['Sell', 'Spawn Rates'], ascending=False).head(10)
+target_critters
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | Name                 | type   | Sell | Spawn Rates |
+|-----|----------------------|--------|------|-------------|
+| 52  | orchid mantis        | insect | 2400 | 15          |
+| 64  | saw stag             | insect | 2000 | 20          |
+| 71  | tiger beetle         | insect | 1500 | 15          |
+| 37  | horned dynastid      | insect | 1350 | 35          |
+| 47  | miyama stag          | insect | 1000 | 35          |
+| 34  | hermit crab          | insect | 1000 | 25          |
+| 44  | man-faced stink bug  | insect | 1000 | 20          |
+| 53  | paper kite butterfly | insect | 1000 | 20          |
+| 141 | salmon               | fish   | 700  | 20          |
+| 3   | bagworm              | insect | 600  | 50          |
+
+</div>
