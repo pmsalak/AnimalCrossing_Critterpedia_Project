@@ -1,10 +1,13 @@
 ---
 title: "Animal Crossing - Critterpedia Project"
+author: "Parri Salak"
 format: gfm
 ---
 
 ## Background
 Animal Crossing New Horizons (ACNH) is a popular video game, and one of my personal favorites. One task that players complete during the game is catching "critters" in order to complete their muesuem's collection and sell them for money. In the game, each user has a "Critterpedia" that keeps track of everything they have caught and donated to the muesuem. It is broken down into three categories: Insects, Fish, and Sea Creatures. 
+
+Currently, the data for the these categories of critters is kept seperately. In this project I want to create one complete critterpedia dataframe. This will help me keep track of what I can catch in order to make the most money in game. 
 
 ## The Data
 For this project, I have three excel files containing the complete information of all of the insects, fish, and sea creatures that can be caught in ACNH. The orginal source of the data I will use is Nookipedia.com, a community initiative to create a structured collection of Animal Crossing: New Horizons data. More information can be found at: https://nookipedia.com/wiki/Community:ACNH_Spreadsheet. I will begin by loading each dataset. 
@@ -50,7 +53,7 @@ sea_creatures.info()
 There are only 40 sea creatures to be caught in ACNH. 
 
 ## Data Visualization
-Before working on combining this data to make a complete critterpedia dataframe, I want to explore and visualize each type of critter on its own. 
+Before working on combining this data to make a complete critterpedia dataframe, I want to explore and visualize each type of critter on its own. One of the variables that I am very interested in is "Sell". This is in each critter dataset, and it describes how much you can sell your caught critters for at the general store in game. 
 
 ```{python}
 import seaborn as sns
@@ -107,16 +110,35 @@ sns.countplot(data=critterpedia, x='type')
 plt.show()
 ```
 
-## Handling Missing Data
-Since columns did not match up perfectly between my datasets, I want to find and deal with missing values in my critterpedia.
+How does Sell price differ across types of critters?
 
 ```{python}
+#Boxplot showing Sell price broken down by type of critter
+sns.catplot(data=critterpedia, x='type', y='Sell', kind='box')
+plt.show()
+```
+
+Just based on sell price for each type of critter, it seems like the best strategy for making money would be to focus on catching sea creatures. 
+
+## Data Cleaning & Handling Missing Data
+Since columns did not match up perfectly between my datasets, I want to find and deal with missing values in my critterpedia. My goal is to make this as complete of a dataset as possible, so I want to minimize the amount of information that is missing. 
+
+```{python}
+#Count of missing values
 critterpedia.isnull().sum()
 ```
 
 The variable "Where/How" is missing values for the 40 sea creatures since this was not a column in its individual dataframe. Because of this, I will imput those missing values to reflect where sea creatures can be caught - the Sea!
 
 ```{python}
-critterpedia['Where/How'].fillna("Sea",inplace=True)
+critterpedia = critterpedia['Where/How'].fillna('Sea')
 critterpedia['Where/How'].value_counts()
+```
+
+Additonally, this dataset contains information about what times the critters can be caught for both the northern and southern hemisphere. This is important because the seasons in animal crossing reflect what is haapening in your real-world location. Since I am in the Northern Hemisphere, I only want to keep the data relevant to me. I will delete each of the catch time columns that start with "SH".
+
+
+```{python}
+critterpedia = critterpedia.drop(columns=critterpedia.filter(regex=r"SH ").columns)
+critterpedia.columns
 ```
