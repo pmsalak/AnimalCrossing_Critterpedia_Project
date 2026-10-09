@@ -13,8 +13,8 @@ Creatures.
 
 Currently, the data for the these categories of critters is kept
 seperately. In this project I want to create one complete critterpedia
-dataframe. This will help me keep track of what I can catch in order to
-make the most money in game.
+dataframe. This will help see what I can catch and develop a strategy in
+order to make the most money in game.
 
 ## The Data
 
@@ -432,21 +432,29 @@ the purpose of my project, I think it is only neccessary to keep one.
 
 ``` python
 #Making sure there is a unique value for all 200 critters
-critterpedia['Internal ID'].nunique()
+critterpedia['Name'].nunique()
 ```
 
     200
 
-Since “Unique Entry ID” is able to uniquely identify every critter, I am
-going to delete the other identification columns and rename it to be
-“ID”.
+Since “Name” is able to uniquely identify every critter.
 
 ``` python
 #Dropping extra identification columns
-critterpedia = critterpedia.drop(columns=['#','Icon Filename','Critterpedia Filename','Furniture Filename','Unique Entry ID'])
+critterpedia = critterpedia.drop(columns=['#','Icon Filename','Critterpedia Filename','Furniture Filename','Unique Entry ID','Internal ID'])
+```
 
-#Renaming my ID column
-critterpedia = critterpedia.rename(columns={'Internal ID': 'ID'})
+I also want to get rid of the variables related to Happy Home Academy
+(HHA) because it is not relevant in the catching and selling of
+critters. It is essentially an HOA in animal crossing that evaluates
+your home decor choices. Since caught critters can be displayed, the HHA
+has data related to them. However, I do not care what they think of me
+and my lifestyle choices!! Since this project is for my own personal
+benefit, I will be excluding their data.
+
+``` python
+critterpedia = critterpedia.drop(columns=critterpedia.filter(regex=r"HHA ").columns)
+critterpedia = critterpedia.drop(columns=['Color 1','Color 2','Lighting Type','Version Added', 'Unlocked?'])
 ```
 
 Since columns did not match up perfectly between my datasets, I want to
@@ -494,19 +502,11 @@ critterpedia.isnull().sum()
     Surface                      0
     Description                  0
     Catch phrase                 0
-    HHA Base Points              0
-    HHA Category                 1
-    Color 1                     40
-    Color 2                     40
-    ID                           0
     type                         0
     Shadow                      80
     Catch Difficulty           120
     Vision                     120
-    Lighting Type               80
     Movement Speed             160
-    Version Added              160
-    Unlocked?                  160
     dtype: int64
 
 Additonally, this dataset contains information about what times the
@@ -517,15 +517,67 @@ Hemisphere, I only want to keep the data relevant to me. I will delete
 each of the catch time columns that start with “SH”.
 
 ``` python
+#Getting rid of southern hemisphere data
 critterpedia = critterpedia.drop(columns=critterpedia.filter(regex=r"SH ").columns)
+
+#No longer need NH to specify location, just want month
+critterpedia.columns = critterpedia.columns.str.replace(r"NH ", "", regex=True)
+
 critterpedia.columns
 ```
 
     Index(['Name', 'Icon Image', 'Sell', 'Where/How', 'Weather',
-           'Total Catches to Unlock', 'Spawn Rates', 'NH Jan', 'NH Feb', 'NH Mar',
-           'NH Apr', 'NH May', 'NH Jun', 'NH Jul', 'NH Aug', 'NH Sep', 'NH Oct',
-           'NH Nov', 'NH Dec', 'Size', 'Surface', 'Description', 'Catch phrase',
-           'HHA Base Points', 'HHA Category', 'Color 1', 'Color 2', 'ID', 'type',
-           'Shadow', 'Catch Difficulty', 'Vision', 'Lighting Type',
-           'Movement Speed', 'Version Added', 'Unlocked?'],
+           'Total Catches to Unlock', 'Spawn Rates', 'Jan', 'Feb', 'Mar', 'Apr',
+           'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Size',
+           'Surface', 'Description', 'Catch phrase', 'type', 'Shadow',
+           'Catch Difficulty', 'Vision', 'Movement Speed'],
           dtype='str')
+
+The variable “Spawn Rates” respresents the percent chance of that
+critter being present on your island/avaiable to catch in your game at
+any given time. However, it is a string datatype right now because some
+of the values are listed as a range like “5-10”. I want to fix this and
+take the average value.
+
+``` python
+#Split the string, take the first value, then make it an integer
+critterpedia['Spawn Rates'] = critterpedia['Spawn Rates'].str.split("–").str[0].astype('int')
+```
+
+## Critter Catching Strategy
+
+Finally, I want to compare how the different critter types compare
+across variables and use the information to make a strategy for catching
+and selling critters in ACNH.
+
+``` python
+grouped_data = critterpedia.groupby('type',as_index=False).agg(
+    sell_mean=('Sell','mean'),
+    sell_std=('Sell','std'),
+    spawn_mean=('Spawn Rates','mean'),
+    spawn_std=('Spawn Rates','std')
+)
+
+grouped_data
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | type         | sell_mean | sell_std    | spawn_mean | spawn_std |
+|-----|--------------|-----------|-------------|------------|-----------|
+| 0   | fish         | 3745.0    | 4517.151561 | 3.8625     | 3.893337  |
+| 1   | insect       | 2220.5    | 3209.388877 | 26.3375    | 29.915469 |
+| 2   | sea creature | 3345.0    | 3730.742004 | 2.6750     | 1.685344  |
+
+</div>
